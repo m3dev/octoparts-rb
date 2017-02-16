@@ -94,7 +94,7 @@ module Octoparts
                           else
                             raise Octoparts::ArgumentError
                           end
-      aggregate_request.to_json(camelize: true)
+      aggregate_request.to_json(user_options: {camelize: true})
     end
   end
 end

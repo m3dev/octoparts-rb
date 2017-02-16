@@ -58,7 +58,7 @@ class TestAggregateRequestRepresenter < Test::Unit::TestCase
     aggregate_request = Octoparts::Model::AggregateRequest.new
       .extend(Octoparts::Representer::AggregateRequestRepresenter).from_hash(JSON.parse(@json))
     assert do
-      JSON.parse(aggregate_request.to_json(camelize: true)) == convert_hash_keys(JSON.parse(@json))
+      JSON.parse(aggregate_request.to_json(user_options: {camelize: true})) == convert_hash_keys(JSON.parse(@json))
     end
   end
 end
