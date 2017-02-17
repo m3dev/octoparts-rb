@@ -219,14 +219,14 @@ class TestClient < Test::Unit::TestCase
       body = JSON.parse(body_json, symbolize_names: true)
       assert { body[:requestMeta] != nil }
       request_meta = body[:requestMeta]
-      assert { requset_meta[:id] == 1 }
-      assert { requset_meta[:serviceId] == 'hoge' }
+      assert { request_meta[:id] == 1 }
+      assert { request_meta[:serviceId] == 'hoge' }
       assert { request_meta[:userId] == 2 }
       assert { request_meta[:sessionId] == 3 }
       assert { request_meta[:requestUrl] == 'http://test.com' }
       assert { request_meta[:userAgent] == 'ruby' }
       assert { request_meta[:timeout] == 4 }
-      assert { body[:requests].instance_of(Array) }
+      assert { body[:requests].instance_of?(Array) }
       request_item = body[:requests].first
       assert { request_item[:partId] == 'fuga' }
       assert { request_item[:id] == 5 }
