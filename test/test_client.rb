@@ -193,4 +193,46 @@ class TestClient < Test::Unit::TestCase
       end
     end
   end
+
+  sub_test_case "#create_request_body" do
+    test "return camelized keys" do
+      request_hash = {
+        request_meta: {
+          id: 1,
+          service_id: 'hoge',
+          user_id: 2,
+          session_id: 3,
+          request_url: 'http://test.com',
+          user_agent: 'ruby',
+          timeout: 4
+        },
+        requests: [{
+          part_id: 'fuga',
+          id: 5,
+          params: [{
+            key: 'value_of_key',
+            value: 'value_of_value'
+          }]
+        }]
+      }
+      body_json = Octoparts::Client.new(timeout_sec: 0).send(:create_request_body, request_hash)
+      body = JSON.parse(body_json, symbolize_names: true)
+      assert { body[:requestMeta] != nil }
+      request_meta = body[:requestMeta]
+      assert { request_meta[:id] == 1 }
+      assert { request_meta[:serviceId] == 'hoge' }
+      assert { request_meta[:userId] == 2 }
+      assert { request_meta[:sessionId] == 3 }
+      assert { request_meta[:requestUrl] == 'http://test.com' }
+      assert { request_meta[:userAgent] == 'ruby' }
+      assert { request_meta[:timeout] == 4 }
+      assert { body[:requests].instance_of?(Array) }
+      request_item = body[:requests].first
+      assert { request_item[:partId] == 'fuga' }
+      assert { request_item[:id] == 5 }
+      assert { request_item[:params] != nil }
+      assert { request_item[:params].first[:key] == 'value_of_key' }
+      assert { request_item[:params].first[:value] == 'value_of_value' }
+    end
+  end
 end
