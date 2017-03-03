@@ -1,6 +1,7 @@
 # Octoparts
 
 [![Gem Version](https://badge.fury.io/rb/octoparts.svg)](http://badge.fury.io/rb/octoparts)
+[![Build Status](https://travis-ci.org/m3dev/octoparts-rb.svg?branch=master)](https://travis-ci.org/m3dev/octoparts-rb)
 
 Octoparts Client for Ruby
 
