@@ -153,29 +153,24 @@ class TestClient < Test::Unit::TestCase
 
   sub_test_case "timeout" do
     setup do
-      @endpoint = Octoparts.configuration.endpoint
-      Octoparts.configure do |c|
-        # avoiding connection failed error, sorry heroku...
-        # we should find other way
-        c.endpoint = 'http://octoparts.herokuapp.com'
-      end
       @exception_class = defined?(Faraday::TimeoutError) ? Faraday::TimeoutError : Faraday::Error::TimeoutError
     end
 
     teardown do
       Octoparts.configure do |c|
-        c.endpoint = @endpoint
         c.timeout_sec = nil
       end
     end
 
     test "timeout_sec option" do
+      stub_request(:get, 'localhost:9000').to_raise(Timeout::Error)
       assert_raise @exception_class do
         Octoparts::Client.new(timeout_sec: 0).get('/')
       end
     end
 
     test "open_timeout_sec option" do
+      stub_request(:get, 'localhost:9000').to_raise(Timeout::Error)
       Octoparts.configure do |c|
         c.timeout_sec = 0
       end
