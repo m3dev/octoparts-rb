@@ -5,7 +5,7 @@ module Octoparts
     attr_reader :response
 
     def self.from_response(response)
-      status = response.status.to_i
+      status = response.code.to_i
 
       klass = case status
               when 400..499 then Octoparts::ClientError
@@ -20,7 +20,7 @@ module Octoparts
     end
 
     def error_message
-      "status: #{@response.status}, body: #{@response.body}"
+      "status: #{@response.code}, body: #{@response.body}"
     end
   end
 

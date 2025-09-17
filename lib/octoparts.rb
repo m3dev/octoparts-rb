@@ -1,4 +1,5 @@
-require "faraday"
+require "net/http"
+require "json"
 require "octoparts/version"
 require "octoparts/configuration"
 require "octoparts/error"

@@ -153,7 +153,7 @@ class TestClient < Test::Unit::TestCase
 
   sub_test_case "timeout" do
     setup do
-      @exception_class = defined?(Faraday::TimeoutError) ? Faraday::TimeoutError : Faraday::Error::TimeoutError
+      @exception_class = Timeout::Error
     end
 
     teardown do

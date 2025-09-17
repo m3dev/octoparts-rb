@@ -1,5 +1,8 @@
 require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/object/blank'
 require 'uri'
+require 'net/http'
+require 'json'
 
 module Octoparts
   class Client
@@ -30,8 +33,8 @@ module Octoparts
       resp = post(OCTOPARTS_API_ENDPOINT_PATH, body, headers)
       Response.new(
         Model::AggregateResponse.new.extend(Representer::AggregateResponseRepresenter).from_json(resp.body),
-        resp.headers,
-        resp.status
+        resp.to_hash,
+        resp.code
       )
     end
 
@@ -63,22 +66,36 @@ module Octoparts
       resp = post(escaped_path)
       Response.new(
         resp.body,
-        resp.headers,
-        resp.status
+        resp.to_hash,
+        resp.code
       )
     end
 
     def process(method, path, params, body, headers)
-      @connection ||= Faraday.new(url: @endpoint) do |connection|
-        connection.adapter Faraday.default_adapter
-      end
-      response = @connection.send(method) do |request|
-        request.url(path, params)
-        request.body = body if body
-        request.headers.merge!(headers)
-        request.options[:timeout] = @timeout_sec if @timeout_sec
-        request.options[:open_timeout] = @open_timeout_sec if @open_timeout_sec
-      end
+      uri = URI(@endpoint)
+      uri.path = path
+      uri.query = URI.encode_www_form(params) unless params.blank?
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      http.read_timeout = @timeout_sec
+      http.open_timeout = @open_timeout_sec
+
+      request = case method
+                when :get
+                  Net::HTTP::Get.new(uri)
+                when :post
+                  Net::HTTP::Post.new(uri)
+                else
+                  raise ArgumentError, "Unsupported HTTP method: #{method}"
+                end
+
+      request.body = body if body
+      headers.each { |key, value| request[key] = value }
+      @headers.each { |key, value| request[key] = value }
+
+      response = http.request(request)
+
       if error = Octoparts::ResponseError.from_response(response)
         raise error
       end
